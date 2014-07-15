@@ -59,10 +59,10 @@ class ColumnsToCAT:
             anchor = ET.SubElement(node, "token_anchor")
             anchor.set("id", str(i))
 
-    def __createLinks(self, node, rel_id, rel_type, signal_id, source_id, target_id):
+    def __createLinks(self, node, rel_id, rel_type, signal_id, source_id, target_id, signal_name):
         node.set("id", str(rel_id))
         if rel_type != None: node.set("relType", rel_type)
-        if signal_id != "O": node.set("signalID", signal_id)
+        if signal_id != "O": node.set(signal_name, signal_id)
         node.set("comment", "")  
 
         source = ET.SubElement(node, "source")
@@ -74,12 +74,14 @@ class ColumnsToCAT:
         if link_col != "O":
             for link in link_col.split("||"):
                 x = link.split(":")
+                signal_name = "signalID"
                 if rel_name == "CLINK":
                     (entity_id, signal_id) = (x[0], x[1])
+                    signal_name = "c-signalID"
                     rel_type = None
                 else: (entity_id, rel_type, signal_id) = (x[0], x[1], x[2])         
                 link = ET.SubElement(rel, rel_name)
-                self.__createLinks(link, self.rel_id, rel_type, signal_id, source_id, entity_id)
+                self.__createLinks(link, self.rel_id, rel_type, signal_id, source_id, entity_id, signal_name)
                 self.rel_id += 1
 
     #generate CAT XML tree

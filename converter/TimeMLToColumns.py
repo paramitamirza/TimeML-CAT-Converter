@@ -62,11 +62,11 @@ class TimeMLToColumns:
         
     def __parseSignalTag(self, text):
         sid = re.findall(r'sid=\"(.+?)\"', text)[0]
-        return (sid)
+        return sid
 
     def __parseCSignalTag(self, text):
         cid = re.findall(r'cid=\"(.+?)\"', text)[0]
-        return (cid)
+        return cid
 
     #parse instances and event attributes
     def __parseEventInstances(self):
@@ -165,8 +165,8 @@ class TimeMLToColumns:
             words = []
             event_attr = None
             timex_attr = None
-            signal_attr = None
-            csignal_attr = None
+            signal_id = None
+            csignal_id = None
 
             sid = int(sen.get('id'))
             tokens = sen.find('tokens').findall('token')
@@ -185,17 +185,17 @@ class TimeMLToColumns:
                 elif "</TIMEX3>" in word:
                     timex_attr = None
                 elif "<SIGNAL" in word:
-                    signal_attr = self.__parseSignalTag(word)
-                    self.entities.append(signal_attr[0])
+                    signal_id = self.__parseSignalTag(word)
+                    self.entities.append(signal_id)
                 elif "</SIGNAL>" in word:
-                    signal_attr = None
+                    signal_id = None
                 elif "<CSIGNAL" in word:
-                    csignal_attr = self.__parseCSignalTag(word)
-                    self.entities.append(csignal_attr[0])
+                    csignal_id = self.__parseCSignalTag(word)
+                    self.entities.append(csignal_id)
                 elif "</CSIGNAL>" in word:
-                    csignal_attr = None
+                    csignal_id = None
                 else: 
-                    words.append((word.replace(u'\xa0', " "), event_attr, timex_attr, signal_attr, csignal_attr))
+                    words.append((word.replace(u'\xa0', " "), event_attr, timex_attr, signal_id, csignal_id))
             self.sentences.append(words)
 
     #parse tokenization output from TextPro
@@ -212,8 +212,8 @@ class TimeMLToColumns:
         csignal_tag = ""
         event_attr = None
         timex_attr = None
-        signal_attr = None
-        csignal_attr = None
+        signal_id = None
+        csignal_id = None
         
         while True:
             line = txpfile.readline()
@@ -252,10 +252,10 @@ class TimeMLToColumns:
                 timex_attr = None
             elif "</TIMEX3>" in line.strip():    #there is "May</TIMEX3>." -.-
                 tokks = line.strip().split("</TIMEX3>")
-                words.append((tokks[0], event_attr, timex_attr, signal_attr, csignal_attr))
+                words.append((tokks[0], event_attr, timex_attr, signal_id, csignal_id))
                 timex_tag = ""
                 timex_attr = None
-                words.append((tokks[1], event_attr, timex_attr, signal_attr, csignal_attr))
+                words.append((tokks[1], event_attr, timex_attr, signal_id, csignal_id))
                 if tokks[1] == ".": 
                     self.sentences.append(words)
                     words = []
@@ -267,11 +267,11 @@ class TimeMLToColumns:
                         break
                     else:
                         signal_tag += line2.strip()
-                signal_attr = self.__parseSignalTag(signal_tag)
-                self.entities.append(signal_attr[0])
+                signal_id = self.__parseSignalTag(signal_tag)
+                self.entities.append(signal_id)
             elif line.strip() == "</SIGNAL>":    
                 signal_tag = ""
-                signal_attr = None
+                signal_id = None
             elif line.strip() == "CSIGNAL":
                 csignal_tag += line.strip()
                 while True:
@@ -280,18 +280,18 @@ class TimeMLToColumns:
                         break
                     else:
                         csignal_tag += line2.strip()
-                csignal_attr = self.__parseCSignalTag(csignal_tag)
-                self.entities.append(csignal_attr[0])
+                csignal_id = self.__parseCSignalTag(csignal_tag)
+                self.entities.append(csignal_id)
             elif line.strip() == "</CSIGNAL>":    
                 csignal_tag = ""
-                csignal_attr = None
+                csignal_id = None
             elif line.strip() == "" and (timex_tag == "" and event_tag == "" and signal_tag == "" and csignal_tag == ""):
                 self.sentences.append(words)
                 words = []
             elif line.strip() == "" and (timex_tag != "" or event_tag != "" or signal_tag != "" or csignal_tag != ""):
                 continue
             else:
-                words.append((line.strip(), event_attr, timex_attr, signal_attr, csignal_attr))
+                words.append((line.strip(), event_attr, timex_attr, signal_id, csignal_id))
 
         #print self.sentences
 
@@ -335,7 +335,7 @@ class TimeMLToColumns:
         #TEXT
         for sen in self.sentences:
             if len(sen) > 0:
-                for (word, event_attr, timex_attr, signal_attr, csignal_attr) in sen:
+                for (word, event_attr, timex_attr, signal_id, csignal_id) in sen:
                     line += word
                     
                     #event attributes if any: (event_id, event_class, stem, tense, aspect, polarity, modality, pos)
@@ -385,7 +385,7 @@ class TimeMLToColumns:
                         if eid in self.clinks:
                             clink_str = ""
                             for clink in self.clinks[eid]:
-                                clink_str += self.__getEntityID(clink[0]) + ":" + clink[1] + "||"
+                                clink_str += self.__getEntityID(clink[0]) + ":" + self.__getEntityID(clink[1]) + "||"
                             line += "\t" + clink_str[0:-2]
                         else:
                             line += "\tO"
@@ -424,19 +424,15 @@ class TimeMLToColumns:
                         line += "\tO\tO\tO\tO\tO\tO"
                         line += "\tO"   #tlinks
 
-                    #signal attributes if any: (signal_id)
-                    if signal_attr is not None:
-                        line += "\t" + str(self.entities.index(signal_attr[0])+1)
-                        for i in range(1, len(signal_attr)):
-                            line += "\t" + signal_attr[i]
+                    #signal attributes if any: signal_id
+                    if signal_id is not None:
+                        line += "\t" + str(self.entities.index(signal_id)+1)
                     else:
                         line += "\tO"
 
-                    #causal signal attributes if any: (signal_id)
-                    if csignal_attr is not None:
-                        line += "\t" + str(self.entities.index(csignal_attr[0])+1)
-                        for i in range(1, len(csignal_attr)):
-                            line += "\t" + csignal_attr[i]
+                    #causal signal attributes if any: csignal_id
+                    if csignal_id is not None:
+                        line += "\t" + str(self.entities.index(csignal_id)+1)
                     else:
                         line += "\tO"
 
