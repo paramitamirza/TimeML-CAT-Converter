@@ -35,7 +35,8 @@ class ColumnsToCAT:
     def __createTimex(self, node, start_idx, end_idx, tid, ttype, tvalue, tanchor, tfunction, tfunc_in_doc):
         node.set("id", tid)
         if tfunc_in_doc != "O": node.set("functionInDocument", tfunc_in_doc)
-        node.set("type", ttype[2:])
+        if tfunc_in_doc == "CREATION_TIME": node.set("type", ttype)
+        else: node.set("type", ttype[2:])
         node.set("value", tvalue)
         if tanchor != "O": node.set("anchorTimeID", tanchor)
         node.set("beginPoint", "")
@@ -114,6 +115,7 @@ class ColumnsToCAT:
                     (dct_id, dct_type, dct_value, dct_anchor, dct_function, dct_func_in_doc) = (cols[13], cols[14], cols[15], cols[16], cols[17], cols[18])
                     timex = ET.SubElement(mark, "TIMEX3")
                     self.__createTimex(timex, 0, 0, dct_id, dct_type, dct_value, dct_anchor, dct_function, dct_func_in_doc)
+                    self.__generateLinks(rel, cols[19], "TLINK", dct_id)
 
                 else:
                     #token

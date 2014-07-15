@@ -317,7 +317,14 @@ class TimeMLToColumns:
         line += "\t" + self.__getEntityID(timex_attr[0])
         for i in range(1, len(timex_attr)):
             line += "\t" + timex_attr[i]
-        line += "\tO"   #tlinks
+        #line += "\tO"   #tlinks
+        if timex_attr[0] in self.tlinks:
+            tlink_str = ""
+            for tlink in self.tlinks[timex_attr[0]]:
+                tlink_str += self.__getEntityID(tlink[0]) + ":" + tlink[1] + ":" + self.__getEntityID(tlink[2]) + "||"
+            line += "\t" + tlink_str[0:-2]
+        else:
+            line += "\tO"
         line += "\tO"   #signal
         line += "\tO"   #csignal
         line += "\n\n"
@@ -339,7 +346,7 @@ class TimeMLToColumns:
                                 if prev_event_id != event_attr[0]: 
                                     line += "\tB-" + event_attr[i]
                                     prev_event_id = event_attr[0]
-                                else: line += "\tI-" + event_attr[i] 
+                                else: line += "\tI-" + event_attr[i]
                             else: line += "\t" + event_attr[i]
                         eid = event_attr[0]
                         if eid in self.instances:
@@ -352,30 +359,34 @@ class TimeMLToColumns:
                             for i in range(6): line += "\tO"
                         #tlinks if any
                         if eid in self.tlinks:
-                            line += "\t" + self.__getEntityID(self.tlinks[eid][0][0]) + ":" + self.tlinks[eid][0][1] + ":" + self.__getEntityID(self.tlinks[eid][0][2])
-                            for i in range (1, len(self.tlinks[eid])):
-                                line += "||" + self.__getEntityID(self.tlinks[eid][i][0]) + ":" + self.tlinks[eid][i][1] + ":" + self.__getEntityID(self.tlinks[eid][i][2])
+                            tlink_str = ""
+                            for tlink in self.tlinks[eid]:
+                                tlink_str += self.__getEntityID(tlink[0]) + ":" + tlink[1] + ":" + self.__getEntityID(tlink[2]) + "||"
+                            line += "\t" + tlink_str[0:-2]
                         else:
                             line += "\tO"
                         #slinks if any
                         if eid in self.slinks:
-                            line += "\t" + self.__getEntityID(self.slinks[eid][0][0]) + ":" + self.slinks[eid][0][1] + ":" + self.__getEntityID(self.slinks[eid][0][2])
-                            for i in range (1, len(self.slinks[eid])):
-                                line += "||" + self.__getEntityID(self.slinks[eid][i][0]) + ":" + self.slinks[eid][i][1] + ":" + self.__getEntityID(self.slinks[eid][i][2])
+                            slink_str = ""
+                            for slink in self.slinks[eid]:
+                                slink_str += self.__getEntityID(slink[0]) + ":" + slink[1] + ":" + self.__getEntityID(slink[2]) + "||"
+                            line += "\t" + slink_str[0:-2]
                         else:
                             line += "\tO"
                         #alinks if any
                         if eid in self.alinks:
-                            line += "\t" + self.__getEntityID(self.alinks[eid][0][0]) + ":" + self.alinks[eid][0][1] + ":" + self.__getEntityID(self.alinks[eid][0][2])
-                            for i in range (1, len(self.alinks[eid])):
-                                line += "||" + self.__getEntityID(self.alinks[eid][i][0]) + ":" + self.alinks[eid][i][1] + ":" + self.__getEntityID(self.alinks[eid][i][2])
+                            alink_str = ""
+                            for alink in self.alinks[eid]:
+                                alink_str += self.__getEntityID(alink[0]) + ":" + alink[1] + ":" + self.__getEntityID(alink[2]) + "||"
+                            line += "\t" + alink_str[0:-2]
                         else:
                             line += "\tO"
                         #clinks if any
                         if eid in self.clinks:
-                            line += "\t" + self.__getEntityID(self.clinks[eid][0][0]) + ":" + self.clinks[eid][0][1]
-                            for i in range (1, len(self.clinks[eid])):
-                                line += "||" + self.__getEntityID(self.clinks[eid][i][0]) + ":" + self.clinks[eid][i][1]
+                            clink_str = ""
+                            for clink in self.clinks[eid]:
+                                clink_str += self.__getEntityID(clink[0]) + ":" + clink[1] + "||"
+                            line += "\t" + clink_str[0:-2]
                         else:
                             line += "\tO"
 
@@ -402,9 +413,10 @@ class TimeMLToColumns:
                         tid = timex_attr[0]
                         #tlinks if any
                         if tid in self.tlinks:
-                            line += "\t" + self.__getEntityID(self.tlinks[tid][0][0]) + ":" + self.tlinks[tid][0][1] + ":" + self.__getEntityID(self.tlinks[tid][0][2])
-                            for i in range (1, len(self.tlinks[tid])):
-                                line += "||" + self.__getEntityID(self.tlinks[tid][i][0]) + ":" + self.tlinks[tid][i][1] + ":" + self.__getEntityID(self.tlinks[tid][i][2])
+                            tlink_str = ""
+                            for tlink in self.tlinks[tid]:
+                                tlink_str += self.__getEntityID(tlink[0]) + ":" + tlink[1] + ":" + self.__getEntityID(tlink[2]) + "||"
+                            line += "\t" + tlink_str[0:-2]
                         else:
                             line += "\tO"
                     else:
@@ -452,13 +464,19 @@ class TimeMLToColumns:
         self.__parseALINKs()
         self.__parseCLINKs()
 
+        config = {}
+        config_file = open("converter/parser.config", "r")
+        for line in config_file:
+            x = line.split("=")
+            config[x[0].strip()] = x[1].strip()[1:-1]
+
         if self.stanford_corenlp:
             with open("log", 'w') as logfile:
-                command = "java -cp stanford-corenlp/stanford-corenlp-3.3.1.jar:stanford-corenlp/stanford-corenlp-3.3.1-models.jar:stanford-corenlp/xom.jar:stanford-corenlp/joda-time.jar:stanford-corenlp/jollyday.jar -Xmx2g edu.stanford.nlp.pipeline.StanfordCoreNLP -annotators tokenize,ssplit -file temp -outputFormat xml"
+                command = "java -cp " + config["STANFORD_CORENLP_PATH"] + "stanford-corenlp-" + config["STANFORD_CORENLP_VERSION"] + ".jar:" + config["STANFORD_CORENLP_PATH"] + "stanford-corenlp-3.3.1-models.jar:" + config["STANFORD_CORENLP_PATH"] + "xom.jar:stanford-corenlp/joda-time.jar:" + config["STANFORD_CORENLP_PATH"] + "jollyday.jar -Xmx2g edu.stanford.nlp.pipeline.StanfordCoreNLP -annotators tokenize,ssplit -file temp -outputFormat xml"
                 subprocess.call(command.split(" "), stderr=logfile)
             self.__parseStanfordOutput("temp.xml")
         elif self.textpro:
-            command = "./TextPro/textpro.sh -l eng -c token -y temp"
+            command = config["TEXTPRO_PATH"] + "textpro.sh -l eng -c token -y temp"
             #command = "perl ./TextPro1.5.2/textpro.pl -l eng -c token -y temp"
             subprocess.call(command.split(" "))
             self.__parseTextProOutput("temp.txp")
