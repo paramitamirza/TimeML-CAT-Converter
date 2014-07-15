@@ -3,6 +3,10 @@ TimeML-CAT-Converter
 
 Python codes for converting text with TimeML annotation to CAT-XML annotation, and vice versa.
 
+###Requirements
+..* Python 2.7 or higher
+..* an NLP tool for tokenization and sentence splitter, i.e. Stanford CoreNLP or TextPro
+
 ###To convert text with TimeML annotation to CAT-XML annotation
 _! A parser for tokenization and sentence splitting is needed !_
 
