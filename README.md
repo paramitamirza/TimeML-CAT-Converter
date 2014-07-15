@@ -24,8 +24,8 @@ Usage:
 python convertTimeMLToCAT.py dir_name [options]        or
 python convertTimeMLToCAT.py file_name [options]
 
-options: -p parser_name: 'stanford' | 'textpro' (for tokenization and sentence splitting, default: textpro)
-         -o output_dir_name/file_name (default: 'dir_path/dir_name_CAT' for directory and 'file_path/file_name_CAT.xml' for file)
+options: -p parser_name: stanford | textpro (for tokenization and sentence splitting, default: textpro)
+         -o output_dir_name/file_name (default: dir_path/dir_name_CAT for directory and file_path/file_name_CAT.xml for file)
 ```   
              
 ###To convert text with CAT-XML annotation to TimeML annotation
@@ -34,6 +34,6 @@ Usage:
 python convertCATToTimeML.py dir_name [options]        or
 python convertCATToTimeML.py file_name [options]
 
-options: -o output_dir_name/file_name (default: 'dir_path/dir_name_TimeML' for directory and 'file_path/file_name.tml' for file)
+options: -o output_dir_name/file_name (default: dir_path/dir_name_TimeML for directory and file_path/file_name.tml for file)
 ```
       
