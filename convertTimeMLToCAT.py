@@ -17,8 +17,8 @@ def printUsage():
     print "usage: python convertTimeMLToCAT.py dir_name [options]"
     print "   or: python convertTimeMLToCAT.py file_name [options]"
     print " "
-    print "       options: -p parser_name: 'stanford' | 'textpro' (for tokenization and sentence splitting, default: textpro)"
-    print "       options: -o output_dir_name/file_name (default: 'dir_path/dir_name_CAT' for directory and 'file_path/file_name_CAT.xml' for file)"
+    print "       options: -p parser_name: stanford | textpro (for tokenization and sentence splitting, default: textpro)"
+    print "       options: -o output_dir_name/file_name (default: dir_path/dir_name_CAT/ for directory and file_path/file_name_CAT.xml for file)"
 
 #main
 if __name__ == '__main__':
