@@ -300,31 +300,48 @@ class TimeMLToColumns:
         elif eid == "O": return eid
         else: return str(self.entities.index(eid) + 1)
 
+    def __getLinkString(self, links, entity_id):
+        link_str = ""
+        if entity_id in links:
+            for link in links[entity_id]:
+                #           entity_id                             related_entity_id                   rel_type        signal_id
+                link_str += self.__getEntityID(entity_id) + ":" + self.__getEntityID(link[0]) + ":" + link[1] + ":" + self.__getEntityID(link[2]) + "||"
+            link_str = link_str[0:-2]
+        else:
+            link_str = "O"
+        return link_str
+
+    def __getCLinkString(self, links, entity_id):
+        link_str = ""
+        if entity_id in links:
+            for link in links[entity_id]:
+                #           entity_id                             related_entity_id                   signal_id
+                link_str += self.__getEntityID(entity_id) + ":" + self.__getEntityID(link[0]) + ":" + self.__getEntityID(link[1]) + "||"
+            link_str = link_str[0:-2]
+        else:
+            link_str = "O"
+        return link_str
+
     def __buildColumns(self):
         line = ""
 
-        #0      1         2            3     4      5       6    7    8    9       10      11      12      13        14     15      16       17     18        19      20         21
-        #token, event_id, event_class, stem, tense, aspect, pol, mod, pos, TLINKs, SLINKs, ALINKs, CLINKs, timex_id, ttype, tvalue, tanchor, tfunc, tfuncdoc, TLINKs, signal_id, c-signal_id  
+        #0      1         2            3     4      5       6    7    8    9         10     11      12       13     14        15      16      17      18      19         20         
+        #token, event_id, event_class, stem, tense, aspect, pol, mod, pos, timex_id, ttype, tvalue, tanchor, tfunc, tfuncdoc, TLINKs, SLINKs, ALINKs, CLINKs, signal_id, c-signal_id
 
         #DCT
         (dct_text, timex_attr) = self.dct
         line += "DCT"
-        line += "\tO\tO\tO\tO\tO\tO\tO\tO"  #event
-        line += "\tO"   #tlinks
-        line += "\tO"   #slinks
-        line += "\tO"   #alinks
-        line += "\tO"   #clinks
+        for i in range(8): line += "\tO"    #event  
+
+        #timex    
         line += "\t" + self.__getEntityID(timex_attr[0])
         for i in range(1, len(timex_attr)):
             line += "\t" + timex_attr[i]
-        #line += "\tO"   #tlinks
-        if timex_attr[0] in self.tlinks:
-            tlink_str = ""
-            for tlink in self.tlinks[timex_attr[0]]:
-                tlink_str += self.__getEntityID(tlink[0]) + ":" + tlink[1] + ":" + self.__getEntityID(tlink[2]) + "||"
-            line += "\t" + tlink_str[0:-2]
-        else:
-            line += "\tO"
+
+        line += "\t" + self.__getLinkString(self.tlinks, timex_attr[0])  #tlinks
+        line += "\tO"   #slinks
+        line += "\tO"   #alinks
+        line += "\tO"   #clinks
         line += "\tO"   #signal
         line += "\tO"   #csignal
         line += "\n\n"
@@ -337,10 +354,14 @@ class TimeMLToColumns:
             if len(sen) > 0:
                 for (word, event_attr, timex_attr, signal_id, csignal_id) in sen:
                     line += word
+
+                    (tlink_str, slink_str, alink_str, clink_str) = ("O", "O", "O", "O")
                     
                     #event attributes if any: (event_id, event_class, stem, tense, aspect, polarity, modality, pos)
                     if event_attr is not None:
-                        line += "\t" + self.__getEntityID(event_attr[0])
+                        line += "\t" + self.__getEntityID(event_attr[0])    #event_id
+
+                        #event_class, stem
                         for i in range(1, len(event_attr)):
                             if i==1:
                                 if prev_event_id != event_attr[0]: 
@@ -348,6 +369,8 @@ class TimeMLToColumns:
                                     prev_event_id = event_attr[0]
                                 else: line += "\tI-" + event_attr[i]
                             else: line += "\t" + event_attr[i]
+
+                        #tense, aspect, polarity, modality, pos
                         eid = event_attr[0]
                         if eid in self.instances:
                             for eatr in self.instances[eid]:
@@ -356,51 +379,22 @@ class TimeMLToColumns:
                                 else:
                                     line += "\t" + eatr.replace(" ", "_")
                         else:
-                            for i in range(6): line += "\tO"
-                        #tlinks if any
-                        if eid in self.tlinks:
-                            tlink_str = ""
-                            for tlink in self.tlinks[eid]:
-                                tlink_str += self.__getEntityID(tlink[0]) + ":" + tlink[1] + ":" + self.__getEntityID(tlink[2]) + "||"
-                            line += "\t" + tlink_str[0:-2]
-                        else:
-                            line += "\tO"
-                        #slinks if any
-                        if eid in self.slinks:
-                            slink_str = ""
-                            for slink in self.slinks[eid]:
-                                slink_str += self.__getEntityID(slink[0]) + ":" + slink[1] + ":" + self.__getEntityID(slink[2]) + "||"
-                            line += "\t" + slink_str[0:-2]
-                        else:
-                            line += "\tO"
-                        #alinks if any
-                        if eid in self.alinks:
-                            alink_str = ""
-                            for alink in self.alinks[eid]:
-                                alink_str += self.__getEntityID(alink[0]) + ":" + alink[1] + ":" + self.__getEntityID(alink[2]) + "||"
-                            line += "\t" + alink_str[0:-2]
-                        else:
-                            line += "\tO"
-                        #clinks if any
-                        if eid in self.clinks:
-                            clink_str = ""
-                            for clink in self.clinks[eid]:
-                                clink_str += self.__getEntityID(clink[0]) + ":" + self.__getEntityID(clink[1]) + "||"
-                            line += "\t" + clink_str[0:-2]
-                        else:
-                            line += "\tO"
+                            for i in range(5): line += "\tO"
+
+                        tlink_str = self.__getLinkString(self.tlinks, eid)  #tlinks
+                        slink_str = self.__getLinkString(self.slinks, eid)  #slinks
+                        alink_str = self.__getLinkString(self.alinks, eid)  #alinks
+                        clink_str = self.__getCLinkString(self.clinks, eid) #clinks
 
                     else:
                         prev_event_id = None
-                        line += "\tO\tO\tO\tO\tO\tO\tO\tO"
-                        line += "\tO"   #tlinks
-                        line += "\tO"   #slinks
-                        line += "\tO"   #alinks
-                        line += "\tO"   #clinks
+                        for i in range(8): line += "\tO"
 
                     #timex attributes if any: (timex_id, timex_type, timex_value, anchor, tfunc, tfuncdoc)
                     if timex_attr is not None:
-                        line += "\t" + self.__getEntityID(timex_attr[0])
+                        line += "\t" + self.__getEntityID(timex_attr[0])    #timex_id
+
+                        #timex_type, timex_value, anchor, tfunc, tfuncdoc
                         for i in range(1, len(timex_attr)):
                             if i==1: 
                                 if prev_timex_id != timex_attr[0]: 
@@ -410,31 +404,26 @@ class TimeMLToColumns:
                             elif i==3: 
                                 line += "\t" + self.__getEntityID(timex_attr[i])
                             else: line += "\t" + timex_attr[i]
+
                         tid = timex_attr[0]
-                        #tlinks if any
-                        if tid in self.tlinks:
-                            tlink_str = ""
-                            for tlink in self.tlinks[tid]:
-                                tlink_str += self.__getEntityID(tlink[0]) + ":" + tlink[1] + ":" + self.__getEntityID(tlink[2]) + "||"
-                            line += "\t" + tlink_str[0:-2]
-                        else:
-                            line += "\tO"
+                        tlink_str = self.__getLinkString(self.tlinks, tid)  #tlinks
+
                     else:
                         prev_timex_id = None
-                        line += "\tO\tO\tO\tO\tO\tO"
-                        line += "\tO"   #tlinks
+                        for i in range(6): line += "\tO"
+
+                    line += "\t" + tlink_str
+                    line += "\t" + slink_str
+                    line += "\t" + alink_str
+                    line += "\t" + clink_str
 
                     #signal attributes if any: signal_id
-                    if signal_id is not None:
-                        line += "\t" + str(self.entities.index(signal_id)+1)
-                    else:
-                        line += "\tO"
+                    if signal_id is not None: line += "\t" + str(self.entities.index(signal_id)+1)
+                    else: line += "\tO"
 
                     #causal signal attributes if any: csignal_id
-                    if csignal_id is not None:
-                        line += "\t" + str(self.entities.index(csignal_id)+1)
-                    else:
-                        line += "\tO"
+                    if csignal_id is not None: line += "\t" + str(self.entities.index(csignal_id)+1)
+                    else: line += "\tO"
 
                     line += "\n"
                 line += "\n"
