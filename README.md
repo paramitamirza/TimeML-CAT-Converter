@@ -5,18 +5,18 @@ Python codes for converting text with TimeML annotation to CAT-XML annotation, a
 
 ###Requirements
 * Python 2.7 or higher
-* an NLP tool for tokenization and sentence splitter, i.e. Stanford CoreNLP or TextPro
+* an NLP tool for tokenization and sentence splitter, i.e. [Stanford CoreNLP](http://nlp.stanford.edu/software/corenlp.shtml) or [TextPro](http://textpro.fbk.eu/)
 
 ###To convert text with TimeML annotation to CAT-XML annotation
 _! A parser for tokenization and sentence splitting is needed !_
 
-For now, the tool can parse the output of Stanford CoreNLP (http://nlp.stanford.edu/software/corenlp.shtml) and TextPro (http://textpro.fbk.eu/).
+For now, the tool can parse the output of [Stanford CoreNLP](http://nlp.stanford.edu/software/corenlp.shtml) and [TextPro](http://textpro.fbk.eu/).
 The path(s) of the parser(s) need to be set in `converter/parser.config` file:
 e.g.
 ```
-STANFORD_CORENLP_PATH = "./stanford-corenlp/"
+STANFORD_CORENLP_PATH = "/home/user/stanford-corenlp/"
 STANFORD_CORENLP_VERSION = "3.3.1"
-TEXTPRO_PATH = "./TextPro/"
+TEXTPRO_PATH = "/home/user/TextPro/"
 ```
 
 Usage:
