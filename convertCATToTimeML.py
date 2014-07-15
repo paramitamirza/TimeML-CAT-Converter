@@ -16,7 +16,7 @@ def printUsage():
     print "usage: python convertCATToTimeML.py dir_name [options]"
     print "   or: python convertCATToTimeML.py file_name [options]"
     print " "
-    print "       options: -o output_dir_name/file_name (default: dir_path/dir_name_TimeML for directory and file_path/file_name.tml for file)"
+    print "       options: -o output_dir_name/file_name (default: dir_path/dir_name_TimeML/ for directory and file_path/file_name.tml for file)"
 
 #main
 if __name__ == '__main__':
