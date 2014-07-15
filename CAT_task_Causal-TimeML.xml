@@ -1,0 +1,330 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<task name="Causal-TimeML">
+<markables>
+<markable color="#fafa14" name="EVENT">
+<attributes>
+<attribute default_value="STATE" name="class" type="combobox">
+<value value="STATE"/>
+<value value="OCCURRENCE"/>
+<value value="PERCEPTION"/>
+<value value="REPORTING"/>
+<value value="I_STATE"/>
+<value value="I_ACTION"/>
+<value value="ASPECTUAL"/>
+<value value="MODAL"/>
+</attribute>
+<attribute default_value="NOUN" name="pos" type="combobox">
+<value value="NOUN"/>
+<value value="VERB"/>
+<value value="ADJECTIVE"/>
+<value value="PREPOSITION"/>
+<value value="OTHER"/>
+<value value="UNKNOWN"/>
+<value value="PREP"/>
+</attribute>
+<attribute default_value="PAST" name="tense" type="combobox">
+<value value="PAST"/>
+<value value="PRESENT"/>
+<value value="FUTURE"/>
+<value value="INFINITIVE"/>
+<value value="PRESPART"/>
+<value value="PASTPART"/>
+<value value="NONE"/>
+</attribute>
+<attribute default_value="NONE" name="aspect" type="combobox">
+<value value="NONE"/>
+<value value="PERFECTIVE"/>
+<value value="IMPERFECTIVE"/>
+<value value="PROGRESSIVE"/>
+<value value="PERFECTIVE_PROGRESSIVE"/>
+<value value="IMPERFECTIVE_PROGRESSIVE"/>
+</attribute>
+<attribute default_value="NONE" name="vform" type="combobox">
+<value value="NONE"/>
+<value value="INFINITIVE"/>
+<value value="GERUND"/>
+<value value="PARTICIPLE"/>
+</attribute>
+<attribute default_value="POS" name="polarity" type="combobox">
+<value value="POS"/>
+<value value="NEG"/>
+</attribute>
+<attribute default_value="NONE" name="mood" type="combobox">
+<value value="NONE"/>
+<value value="SUBJUNCTIVE"/>
+<value value="CONDITIONAL"/>
+<value value="IMPERATIVE"/>
+</attribute>
+<attribute default_value="" name="modality" type="textbox"/>
+<attribute default_value="" name="comment" type="textbox"/>
+</attributes>
+</markable>
+<markable color="#fa7f14" name="SIGNAL">
+<attributes/>
+</markable>
+<markable color="#9c80d6" name="TIMEX3">
+<attributes>
+<attribute default_value="" name="type" type="radiobutton">
+<value value="DATE"/>
+<value value="TIME"/>
+<value value="DURATION"/>
+<value value="SET"/>
+</attribute>
+<attribute default_value="" name="value" type="textbox"/>
+<attribute default_value="BEFORE" name="mod" type="combobox">
+<value value="BEFORE"/>
+<value value="AFTER"/>
+<value value="ON_OR_BEFORE"/>
+<value value="ON_OR_AFTER"/>
+<value value="LESS_THAN"/>
+<value value="MORE_THAN"/>
+<value value="EQUAL_OR_LESS"/>
+<value value="EQUAL_OR_MORE"/>
+<value value="START"/>
+<value value="MID"/>
+<value value="END"/>
+<value value="APPROX"/>
+</attribute>
+<attribute default_value="" name="quant" type="textbox"/>
+<attribute default_value="CREATION_TIME" name="functionInDocument" type="combobox">
+<value value="CREATION_TIME"/>
+<value value="EXPIRATION_TIME"/>
+<value value="MODIFICATION_TIME"/>
+<value value="PUBLICATION_TIME"/>
+<value value="RELEASE_TIME"/>
+<value value="RECEPTION_TIME"/>
+<value value="NONE"/>
+</attribute>
+<attribute default_value="" name="freq" type="textbox"/>
+<attribute default_value="" name="anchorTimeID" type="textbox"/>
+<attribute default_value="" name="beginPoint" type="textbox"/>
+<attribute default_value="" name="endPoint" type="textbox"/>
+<attribute default_value="" name="comment" type="textbox"/>
+</attributes>
+</markable>
+<markable color="#30bf39" name="C-SIGNAL">
+<attributes>
+<attribute default_value="" name="comment" type="textbox"/>
+</attributes>
+</markable>
+</markables>
+<relations>
+<relation cardinality="one_to_one" color="#cbcbcb" direction="false" name="TLINK">
+<attributes>
+<attribute default_value="BEFORE" name="relType" type="combobox">
+<value value="BEFORE"/>
+<value value="AFTER"/>
+<value value="IBEFORE"/>
+<value value="IAFTER"/>
+<value value="DURING"/>
+<value value="DURING_INV"/>
+<value value="BEGINS"/>
+<value value="BEGUN_BY"/>
+<value value="ENDS"/>
+<value value="ENDED_BY"/>
+<value value="INCLUDES"/>
+<value value="IS_INCLUDED"/>
+<value value="IDENTITY"/>
+<value value="SIMULTANEOUS"/>
+</attribute>
+<attribute default_value="" name="signalID" type="referenceLink"/>
+<attribute default_value="" name="comment" type="textbox"/>
+<attribute default_value="BEFORE" name="relType" type="combobox">
+<value value="BEFORE"/>
+<value value="AFTER"/>
+<value value="IBEFORE"/>
+<value value="IAFTER"/>
+<value value="DURING"/>
+<value value="DURING_INV"/>
+<value value="BEGINS"/>
+<value value="BEGUN_BY"/>
+<value value="ENDS"/>
+<value value="ENDED_BY"/>
+<value value="INCLUDES"/>
+<value value="IS_INCLUDED"/>
+<value value="IDENTITY"/>
+<value value="SIMULTANEOUS"/>
+</attribute>
+<attribute default_value="" name="signalID" type="referenceLink"/>
+<attribute default_value="" name="comment" type="textbox"/>
+<attribute default_value="BEFORE" name="relType" type="combobox">
+<value value="BEFORE"/>
+<value value="AFTER"/>
+<value value="IBEFORE"/>
+<value value="IAFTER"/>
+<value value="DURING"/>
+<value value="DURING_INV"/>
+<value value="BEGINS"/>
+<value value="BEGUN_BY"/>
+<value value="ENDS"/>
+<value value="ENDED_BY"/>
+<value value="INCLUDES"/>
+<value value="IS_INCLUDED"/>
+<value value="IDENTITY"/>
+<value value="SIMULTANEOUS"/>
+</attribute>
+<attribute default_value="" name="signalID" type="referenceLink"/>
+<attribute default_value="" name="comment" type="textbox"/>
+<attribute default_value="BEFORE" name="relType" type="combobox">
+<value value="BEFORE"/>
+<value value="AFTER"/>
+<value value="IBEFORE"/>
+<value value="IAFTER"/>
+<value value="DURING"/>
+<value value="DURING_INV"/>
+<value value="BEGINS"/>
+<value value="BEGUN_BY"/>
+<value value="ENDS"/>
+<value value="ENDED_BY"/>
+<value value="INCLUDES"/>
+<value value="IS_INCLUDED"/>
+<value value="IDENTITY"/>
+<value value="SIMULTANEOUS"/>
+</attribute>
+<attribute default_value="" name="signalID" type="referenceLink"/>
+<attribute default_value="" name="comment" type="textbox"/>
+<attribute default_value="BEFORE" name="relType" type="combobox">
+<value value="BEFORE"/>
+<value value="AFTER"/>
+<value value="IBEFORE"/>
+<value value="IAFTER"/>
+<value value="DURING"/>
+<value value="DURING_INV"/>
+<value value="BEGINS"/>
+<value value="BEGUN_BY"/>
+<value value="ENDS"/>
+<value value="ENDED_BY"/>
+<value value="INCLUDES"/>
+<value value="IS_INCLUDED"/>
+<value value="IDENTITY"/>
+<value value="SIMULTANEOUS"/>
+</attribute>
+<attribute default_value="" name="signalID" type="referenceLink"/>
+<attribute default_value="" name="comment" type="textbox"/>
+<attribute default_value="BEFORE" name="relType" type="combobox">
+<value value="BEFORE"/>
+<value value="AFTER"/>
+<value value="IBEFORE"/>
+<value value="IAFTER"/>
+<value value="DURING"/>
+<value value="DURING_INV"/>
+<value value="BEGINS"/>
+<value value="BEGUN_BY"/>
+<value value="ENDS"/>
+<value value="ENDED_BY"/>
+<value value="INCLUDES"/>
+<value value="IS_INCLUDED"/>
+<value value="IDENTITY"/>
+<value value="SIMULTANEOUS"/>
+</attribute>
+<attribute default_value="" name="signalID" type="referenceLink"/>
+<attribute default_value="" name="comment" type="textbox"/>
+<attribute default_value="BEFORE" name="relType" type="combobox">
+<value value="BEFORE"/>
+<value value="AFTER"/>
+<value value="IBEFORE"/>
+<value value="IAFTER"/>
+<value value="DURING"/>
+<value value="DURING_INV"/>
+<value value="BEGINS"/>
+<value value="BEGUN_BY"/>
+<value value="ENDS"/>
+<value value="ENDED_BY"/>
+<value value="INCLUDES"/>
+<value value="IS_INCLUDED"/>
+<value value="IDENTITY"/>
+<value value="SIMULTANEOUS"/>
+</attribute>
+<attribute default_value="" name="signalID" type="referenceLink"/>
+<attribute default_value="" name="comment" type="textbox"/>
+<attribute default_value="BEFORE" name="relType" type="combobox">
+<value value="BEFORE"/>
+<value value="AFTER"/>
+<value value="IBEFORE"/>
+<value value="IAFTER"/>
+<value value="DURING"/>
+<value value="DURING_INV"/>
+<value value="BEGINS"/>
+<value value="BEGUN_BY"/>
+<value value="ENDS"/>
+<value value="ENDED_BY"/>
+<value value="INCLUDES"/>
+<value value="IS_INCLUDED"/>
+<value value="IDENTITY"/>
+<value value="SIMULTANEOUS"/>
+</attribute>
+<attribute default_value="" name="signalID" type="referenceLink"/>
+<attribute default_value="" name="comment" type="textbox"/>
+<attribute default_value="BEFORE" name="relType" type="combobox">
+<value value="BEFORE"/>
+<value value="AFTER"/>
+<value value="IBEFORE"/>
+<value value="IAFTER"/>
+<value value="DURING"/>
+<value value="DURING_INV"/>
+<value value="BEGINS"/>
+<value value="BEGUN_BY"/>
+<value value="ENDS"/>
+<value value="ENDED_BY"/>
+<value value="INCLUDES"/>
+<value value="IS_INCLUDED"/>
+<value value="IDENTITY"/>
+<value value="SIMULTANEOUS"/>
+</attribute>
+<attribute default_value="" name="signalID" type="referenceLink"/>
+<attribute default_value="" name="comment" type="textbox"/>
+<attribute default_value="BEFORE" name="relType" type="combobox">
+<value value="BEFORE"/>
+<value value="AFTER"/>
+<value value="IBEFORE"/>
+<value value="IAFTER"/>
+<value value="DURING"/>
+<value value="DURING_INV"/>
+<value value="BEGINS"/>
+<value value="BEGUN_BY"/>
+<value value="ENDS"/>
+<value value="ENDED_BY"/>
+<value value="INCLUDES"/>
+<value value="IS_INCLUDED"/>
+<value value="IDENTITY"/>
+<value value="SIMULTANEOUS"/>
+</attribute>
+<attribute default_value="" name="signalID" type="referenceLink"/>
+<attribute default_value="" name="comment" type="textbox"/>
+</attributes>
+</relation>
+<relation cardinality="one_to_one" color="#cbcbcb" direction="false" name="ALINK">
+<attributes>
+<attribute default_value="INITIATES" name="relType" type="combobox">
+<value value="INITIATES"/>
+<value value="CULMINATES"/>
+<value value="TERMINATES"/>
+<value value="CONTINUES"/>
+<value value="REINITIATES"/>
+</attribute>
+<attribute default_value="" name="signalID" type="referenceLink"/>
+<attribute default_value="" name="comment" type="textbox"/>
+</attributes>
+</relation>
+<relation cardinality="one_to_one" color="#e01b1b" direction="true" name="SLINK">
+<attributes>
+<attribute default_value="MODAL" name="relType" type="combobox">
+<value value="MODAL"/>
+<value value="EVIDENTIAL"/>
+<value value="NEG_EVIDENTIAL"/>
+<value value="FACTIVE"/>
+<value value="COUNTER_FACTIVE"/>
+<value value="CONDITIONAL"/>
+</attribute>
+<attribute default_value="" name="signalID" type="referenceLink"/>
+<attribute default_value="" name="comment" type="textbox"/>
+</attributes>
+</relation>
+<relation cardinality="one_to_one" color="#0bafd4" direction="false" name="CLINK">
+<attributes>
+<attribute default_value="" name="c-signalID" type="referenceLink"/>
+<attribute default_value="" name="comment" type="textbox"/>
+</attributes>
+</relation>
+</relations>
+</task>
