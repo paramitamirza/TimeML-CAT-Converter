@@ -56,7 +56,8 @@ if __name__ == '__main__':
                     filepath = os.path.join(r, filename)
                     print "Converting " + filepath + "..."
                     out_file = open(output_dir_name + os.path.basename(filepath).replace(".tml", ".xml"), "w")
-                    timeml_cols = TimeMLToColumns.TimeMLToColumns(filepath)
+                    if parser_name != "": timeml_cols = TimeMLToColumns.TimeMLToColumns(filepath, parser_name)
+                    else: timeml_cols = TimeMLToColumns.TimeMLToColumns(filepath)
                     cols_cat = ColumnsToCAT.ColumnsToCAT(timeml_cols.parseTimeML(), timeml_cols.filename)
                     out_file.write(cols_cat.parseColumns())
                     num_tlink += cols_cat.getNumTLINK()
