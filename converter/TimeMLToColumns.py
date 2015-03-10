@@ -16,12 +16,15 @@ class TimeMLToColumns:
         self.dct = ""
         self.sentences = []
         self.entities = []
+        self.entity_types = {}
         self.eventids = {}
         self.instances = {}
         self.tlinks = {}
         self.slinks = {}
         self.alinks = {}
         self.clinks = {}
+
+        self.num_tlink = 0
 
         self.stanford_corenlp = False
         self.textpro = False        
@@ -147,7 +150,7 @@ class TimeMLToColumns:
         for clink in root.findall("CLINK"):
             entID = self.eventids[clink.get("eventInstanceID")]
             relentID = self.eventids[clink.get("relatedToEventInstance")]
-            if clink.get("c-signalID") is not None:
+            if clink.get("c-signalID") is not None and clink.get("c-signalID") != "cnull":
                 csignalID = clink.get("c-signalID")
             else:
                 csignalID = "O"
@@ -177,21 +180,25 @@ class TimeMLToColumns:
                 if "<EVENT" in word:
                     event_attr = self.__parseEventTag(word)
                     self.entities.append(event_attr[0])
+                    self.entity_types[event_attr[0]] = "e"
                 elif "</EVENT>" in word:
                     event_attr = None
                 elif "<TIMEX3" in word:
                     timex_attr = self.__parseTimexTag(word)
                     self.entities.append(timex_attr[0])
+                    self.entity_types[timex_attr[0]] = "tmx"
                 elif "</TIMEX3>" in word:
                     timex_attr = None
                 elif "<SIGNAL" in word:
                     signal_id = self.__parseSignalTag(word)
                     self.entities.append(signal_id)
+                    self.entity_types[signal_id] = "s"
                 elif "</SIGNAL>" in word:
                     signal_id = None
                 elif "<CSIGNAL" in word:
                     csignal_id = self.__parseCSignalTag(word)
                     self.entities.append(csignal_id)
+                    self.entity_types[csignal_id] = "cs"
                 elif "</CSIGNAL>" in word:
                     csignal_id = None
                 else: 
@@ -234,6 +241,7 @@ class TimeMLToColumns:
                         event_tag += line2.strip()
                 event_attr = self.__parseEventTag(event_tag)
                 self.entities.append(event_attr[0])
+                self.entity_types[event_attr[0]] = "e"
             elif line.strip() == "</EVENT>":    
                 event_tag = ""
                 event_attr = None
@@ -247,6 +255,7 @@ class TimeMLToColumns:
                         timex_tag += line2.strip()
                 timex_attr = self.__parseTimexTag(timex_tag)
                 self.entities.append(timex_attr[0])
+                self.entity_types[timex_attr[0]] = "tmx"
             elif line.strip() == "</TIMEX3>":    
                 timex_tag = ""
                 timex_attr = None
@@ -269,6 +278,7 @@ class TimeMLToColumns:
                         signal_tag += line2.strip()
                 signal_id = self.__parseSignalTag(signal_tag)
                 self.entities.append(signal_id)
+                self.entity_types[signal_id] = "s"
             elif line.strip() == "</SIGNAL>":    
                 signal_tag = ""
                 signal_id = None
@@ -282,6 +292,7 @@ class TimeMLToColumns:
                         csignal_tag += line2.strip()
                 csignal_id = self.__parseCSignalTag(csignal_tag)
                 self.entities.append(csignal_id)
+                self.entity_types[csignal_id] = "cs"
             elif line.strip() == "</CSIGNAL>":    
                 csignal_tag = ""
                 csignal_id = None
@@ -296,9 +307,9 @@ class TimeMLToColumns:
         #print self.sentences
 
     def __getEntityID(self, eid):
-        if eid == "t0": return str(0)
+        if eid == "t0": return "tmx" + str(0)
         elif eid == "O": return eid
-        else: return str(self.entities.index(eid) + 1)
+        else: return self.entity_types[eid] + str(self.entities.index(eid) + 1)
 
     def __getLinkString(self, links, entity_id):
         link_str = ""
@@ -325,20 +336,18 @@ class TimeMLToColumns:
     def __buildColumns(self):
         line = ""
 
-        #0      1         2            3     4      5       6    7    8    9         10     11      12       13     14        15      16      17      18      19         20         
-        #token, event_id, event_class, stem, tense, aspect, pol, mod, pos, timex_id, ttype, tvalue, tanchor, tfunc, tfuncdoc, TLINKs, SLINKs, ALINKs, CLINKs, signal_id, c-signal_id
-
+        #0     1        2       3        4     5    6     7      8   9   10  11     12       13      14         15       16          17     18     19     20     21        22
+        #token token_id sent_id ev_id ev_class stem tense aspect pol mod pos tmx_id tmx_type tmx_val tmx_anchor tmx_func tmx_funcdoc TLINKs SLINKs ALINKs CLINKs signal_id c-signal_id
+        
         #DCT
-        (dct_text, timex_attr) = self.dct
-        line += "DCT"
+        (dct_text, (dct_id, dct_type, dct_value, dct_anchor, dct_func, dct_funcdoc)) = self.dct
+        line += "DCT\t-99\t-99"
         for i in range(8): line += "\tO"    #event  
 
         #timex    
-        line += "\t" + self.__getEntityID(timex_attr[0])
-        for i in range(1, len(timex_attr)):
-            line += "\t" + timex_attr[i]
+        line += "\ttmx" + self.__getEntityID(dct_id) + "\t" + dct_type + "\t" + dct_value + "\tO\tO\t" + dct_func
 
-        line += "\t" + self.__getLinkString(self.tlinks, timex_attr[0])  #tlinks
+        line += "\t" + self.__getLinkString(self.tlinks, dct_id)  #tlinks
         line += "\tO"   #slinks
         line += "\tO"   #alinks
         line += "\tO"   #clinks
@@ -346,14 +355,20 @@ class TimeMLToColumns:
         line += "\tO"   #csignal
         line += "\n\n"
 
+        sent_id = 0
+        tok_id = 1
         prev_timex_id = None
         prev_event_id = None
+        (tlink_str, slink_str, alink_str, clink_str) = ("O", "O", "O", "O")
+
+        for eid in self.tlinks:
+            self.num_tlink += len(self.tlinks[eid])
 
         #TEXT
         for sen in self.sentences:
             if len(sen) > 0:
                 for (word, event_attr, timex_attr, signal_id, csignal_id) in sen:
-                    line += word
+                    line += word + "\t" + str(tok_id) + "\t" + str(sent_id)
 
                     (tlink_str, slink_str, alink_str, clink_str) = ("O", "O", "O", "O")
                     
@@ -426,7 +441,9 @@ class TimeMLToColumns:
                     else: line += "\tO"
 
                     line += "\n"
+                    tok_id += 1
                 line += "\n"
+                sent_id += 1
 
         return line.strip()
         
@@ -461,7 +478,7 @@ class TimeMLToColumns:
                 subprocess.call(command.split(" "), stderr=logfile)
             self.__parseStanfordOutput("temp.xml")
         elif self.textpro:
-            command = config["TEXTPRO_PATH"] + "textpro.sh -l eng -c token -y temp"
+            command = "sh " + config["TEXTPRO_PATH"] + "textpro.sh -l eng -c token -y temp"
             #command = "perl ./TextPro1.5.2/textpro.pl -l eng -c token -y temp"
             subprocess.call(command.split(" "))
             self.__parseTextProOutput("temp.txp")
@@ -475,6 +492,9 @@ class TimeMLToColumns:
 
         #print self.__buildColumns()
         return self.__buildColumns()
+
+    def getNumTLINK(self):
+        return self.num_tlink
 
 #timeml_cols = TimeMLToColumns("ABC19980108.1830.0711.tml")
 #timeml_cols.parseTimeML()
