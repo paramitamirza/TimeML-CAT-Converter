@@ -35,54 +35,50 @@ if __name__ == '__main__':
                 elif sys.argv[i] == "-o":
                     if i+1 < len(sys.argv): output = sys.argv[i+1]
 
-    if os.path.isdir(sys.argv[1]):  #input is directory name
-        dirpath = sys.argv[1]
-        if dirpath[-1] != "/": dirpath += "/"
+        if os.path.isdir(sys.argv[1]):  #input is directory name
+            dirpath = sys.argv[1]
+            if dirpath[-1] != "/": dirpath += "/"
 
-        if output != "":
-            output_dir_name = output
+            if output != "":
+                output_dir_name = output
+            else:
+                output_dir_name = os.path.dirname(dirpath) + "_CAT/"
+
+            if output_dir_name[-1] != "/": output_dir_name += "/"
+            ensureDir(output_dir_name)
+
+            for r, d, f in os.walk(dirpath):
+                for filename in f:
+                    #print filename
+                    if filename.endswith(".tml"):
+                        filepath = os.path.join(r, filename)
+                        print "Converting " + filepath + "..."
+                        out_file = open(output_dir_name + os.path.basename(filepath).replace(".tml", ".xml"), "w")
+                        if parser_name != "": timeml_cols = TimeMLToColumns.TimeMLToColumns(filepath, parser_name)
+                        else: timeml_cols = TimeMLToColumns.TimeMLToColumns(filepath)
+                        cols_cat = ColumnsToCAT.ColumnsToCAT(timeml_cols.parseTimeML(), timeml_cols.filename)
+                        out_file.write(cols_cat.parseColumns())
+                        out_file.close()
+
+            print "CAT file(s) are saved in " + output_dir_name
+
+        elif os.path.isfile(sys.argv[1]):   #input is file name
+            print "Converting " + sys.argv[1] + "..."
+
+            if output != "":
+                out_file_name = output
+            else:
+                out_file_name = os.path.splitext(os.path.basename(sys.argv[1]))[0] + "_CAT.xml"
+            out_file = open(out_file_name, "w")
+
+            if parser_name != "": timeml_cols = TimeMLToColumns.TimeMLToColumns(sys.argv[1], parser_name)
+            else: timeml_cols = TimeMLToColumns.TimeMLToColumns(sys.argv[1])
+            cols_cat = ColumnsToCAT.ColumnsToCAT(timeml_cols.parseTimeML(), timeml_cols.filename)
+            out_file.write(cols_cat.parseColumns())
+            out_file.close()
+
+            print "CAT file is saved in " + out_file_name
+
         else:
-            output_dir_name = os.path.dirname(dirpath) + "_CAT/"
-
-        if output_dir_name[-1] != "/": output_dir_name += "/"
-        ensureDir(output_dir_name)
-
-        num_tlink = 0
-
-        for r, d, f in os.walk(dirpath):
-            for filename in f:
-                #print filename
-                if filename.endswith(".tml"):
-                    filepath = os.path.join(r, filename)
-                    print "Converting " + filepath + "..."
-                    out_file = open(output_dir_name + os.path.basename(filepath).replace(".tml", ".xml"), "w")
-                    if parser_name != "": timeml_cols = TimeMLToColumns.TimeMLToColumns(filepath, parser_name)
-                    else: timeml_cols = TimeMLToColumns.TimeMLToColumns(filepath)
-                    cols_cat = ColumnsToCAT.ColumnsToCAT(timeml_cols.parseTimeML(), timeml_cols.filename)
-                    out_file.write(cols_cat.parseColumns())
-                    num_tlink += cols_cat.getNumTLINK()
-                    out_file.close()
-
-        print "Number of TLINKs are " + str(num_tlink)
-        print "CAT file(s) are saved in " + output_dir_name
-
-    elif os.path.isfile(sys.argv[1]):   #input is file name
-        print "Converting " + sys.argv[1] + "..."
-
-        if output != "":
-            out_file_name = output
-        else:
-            out_file_name = os.path.splitext(os.path.basename(sys.argv[1]))[0] + "_CAT.xml"
-        out_file = open(out_file_name, "w")
-
-        if parser_name != "": timeml_cols = TimeMLToColumns.TimeMLToColumns(sys.argv[1], parser_name)
-        else: timeml_cols = TimeMLToColumns.TimeMLToColumns(sys.argv[1])
-        cols_cat = ColumnsToCAT.ColumnsToCAT(timeml_cols.parseTimeML(), timeml_cols.filename)
-        out_file.write(cols_cat.parseColumns())
-        out_file.close()
-
-        print "CAT file is saved in " + out_file_name
-
-    else:
-        print "File/directory " + sys.argv[1] + " doesn't exist."
+            print "File/directory " + sys.argv[1] + " doesn't exist."
                     

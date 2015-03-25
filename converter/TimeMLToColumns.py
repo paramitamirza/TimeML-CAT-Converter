@@ -345,7 +345,7 @@ class TimeMLToColumns:
         for i in range(8): line += "\tO"    #event  
 
         #timex    
-        line += "\ttmx" + self.__getEntityID(dct_id) + "\t" + dct_type + "\t" + dct_value + "\tO\tO\t" + dct_func
+        line += "\t" + self.__getEntityID(dct_id) + "\tB-" + dct_type + "\t" + dct_value + "\tO\tO\t" + dct_func
 
         line += "\t" + self.__getLinkString(self.tlinks, dct_id)  #tlinks
         line += "\tO"   #slinks
@@ -474,7 +474,7 @@ class TimeMLToColumns:
 
         if self.stanford_corenlp:
             with open("log", 'w') as logfile:
-                command = "java -cp " + config["STANFORD_CORENLP_PATH"] + "stanford-corenlp-" + config["STANFORD_CORENLP_VERSION"] + ".jar:" + config["STANFORD_CORENLP_PATH"] + "stanford-corenlp-3.3.1-models.jar:" + config["STANFORD_CORENLP_PATH"] + "xom.jar:stanford-corenlp/joda-time.jar:" + config["STANFORD_CORENLP_PATH"] + "jollyday.jar -Xmx2g edu.stanford.nlp.pipeline.StanfordCoreNLP -annotators tokenize,ssplit -file temp -outputFormat xml"
+                command = "java -cp " + config["STANFORD_CORENLP_PATH"] + "stanford-corenlp-" + config["STANFORD_CORENLP_VERSION"] + ".jar:" + config["STANFORD_CORENLP_PATH"] + "stanford-corenlp-" + config["STANFORD_CORENLP_VERSION"] + "-models.jar:" + config["STANFORD_CORENLP_PATH"] + "xom.jar:"+ config["STANFORD_CORENLP_PATH"] + "joda-time.jar:" + config["STANFORD_CORENLP_PATH"] + "jollyday.jar -Xmx2g edu.stanford.nlp.pipeline.StanfordCoreNLP -annotators tokenize,ssplit -file temp -outputFormat xml"
                 subprocess.call(command.split(" "), stderr=logfile)
             self.__parseStanfordOutput("temp.xml")
         elif self.textpro:

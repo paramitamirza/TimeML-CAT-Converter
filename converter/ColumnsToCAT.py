@@ -86,8 +86,8 @@ class ColumnsToCAT:
 
     #generate CAT XML tree
     def __generateCATTree(self):
-        #0      1         2            3     4      5       6    7    8    9         10     11      12       13     14        15      16      17      18      19         20         
-        #token, event_id, event_class, stem, tense, aspect, pol, mod, pos, timex_id, ttype, tvalue, tanchor, tfunc, tfuncdoc, TLINKs, SLINKs, ALINKs, CLINKs, signal_id, c-signal_id 
+        #0     1        2       3        4     5    6     7      8   9   10  11     12       13      14         15       16          17     18     19     20     21        22
+        #token token_id sent_id ev_id ev_class stem tense aspect pol mod pos tmx_id tmx_type tmx_val tmx_anchor tmx_func tmx_funcdoc TLINKs SLINKs ALINKs CLINKs signal_id c-signal_id
         
         doc_name = os.path.splitext(os.path.basename(self.filename))[0]
         doc = ET.Element("Document")
@@ -96,7 +96,8 @@ class ColumnsToCAT:
         mark = ET.SubElement(doc, "Markables")
         rel = ET.SubElement(doc, "Relations")
 
-        (tid, sid, num) = (1, -1, 0)
+        num = 0
+        tid = 0
         #rel_id = 1
 
         (timex_id, start_tmx, end_tmx) = ("O", 0, 0)
@@ -114,42 +115,43 @@ class ColumnsToCAT:
                 #print len(cols), tid, sid, cols
 
                 if cols[0][0:3] == "DCT":
-                    (dct_id, dct_type, dct_value, dct_anchor, dct_function, dct_func_in_doc) = (cols[9], cols[10], cols[11], cols[12], cols[13], cols[14])
+                    (dct_id, dct_type, dct_value, dct_anchor, dct_function, dct_func_in_doc) = (cols[11], cols[12], cols[13], cols[14], cols[15], cols[16])
                     timex = ET.SubElement(mark, "TIMEX3")
                     self.__createTimex(timex, 0, 0, dct_id, dct_type, dct_value, dct_anchor, dct_function, dct_func_in_doc)
-                    self.__generateLinks(rel, cols[15], "TLINK")
+                    self.__generateLinks(rel, cols[17], "TLINK")
 
                 else:
                     #token
                     tok = ET.SubElement(doc, "token")
-                    tok.set("id", str(tid))
-                    tok.set("sentence", str(sid))
+                    tid = int(cols[1])
+                    tok.set("id", str(cols[1]))
+                    tok.set("sentence", cols[2])
                     tok.set("number", str(num))
                     tok.text = cols[0]
 
                     #print (event_id, start_ev, end_ev), (timex_id, start_tmx, end_tmx)
 
                     #EVENT
-                    if cols[1] != "O":
+                    if cols[3] != "O":
                         if event_id == "O":
-                            (event_id, start_ev, end_ev) = (cols[1], tid, tid)
-                            (eclass, stem, tense, aspect, polarity, modality, pos) = (cols[2], cols[3], cols[4], cols[5], cols[6], cols[7], cols[8]) 
+                            (event_id, start_ev, end_ev) = (cols[3], tid, tid)
+                            (eclass, stem, tense, aspect, polarity, modality, pos) = (cols[4], cols[5], cols[6], cols[7], cols[8], cols[9], cols[10]) 
                             self.__generateLinks(rel, cols[15], "TLINK") 
                             self.__generateLinks(rel, cols[16], "SLINK")
                             self.__generateLinks(rel, cols[17], "ALINK")
                             self.__generateLinks(rel, cols[18], "CLINK")
 
-                        elif cols[1] == event_id:
+                        elif cols[3] == event_id:
                             end_ev = tid
-                        elif cols[1] != event_id and start_ev != 0 and end_ev != 0:
+                        elif cols[3] != event_id and start_ev != 0 and end_ev != 0:
                             event = ET.SubElement(mark, "EVENT")
                             self.__createEvent(event, start_ev, end_ev, event_id, eclass, stem, tense, aspect, polarity, modality, pos)
-                            (event_id, start_ev, end_ev) = (cols[1], tid, tid)
-                            (eclass, stem, tense, aspect, polarity, modality, pos) = (cols[2], cols[3], cols[4], cols[5], cols[6], cols[7], cols[8])
-                            self.__generateLinks(rel, cols[15], "TLINK") 
-                            self.__generateLinks(rel, cols[16], "SLINK")
-                            self.__generateLinks(rel, cols[17], "ALINK")
-                            self.__generateLinks(rel, cols[18], "CLINK")
+                            (event_id, start_ev, end_ev) = (cols[3], tid, tid)
+                            (eclass, stem, tense, aspect, polarity, modality, pos) = (cols[4], cols[5], cols[6], cols[7], cols[8], cols[9], cols[10]) 
+                            self.__generateLinks(rel, cols[17], "TLINK") 
+                            self.__generateLinks(rel, cols[18], "SLINK")
+                            self.__generateLinks(rel, cols[19], "ALINK")
+                            self.__generateLinks(rel, cols[20], "CLINK")
                     else:
                         if event_id != "O" and start_ev != 0 and end_ev != 0:
                             event = ET.SubElement(mark, "EVENT")
@@ -158,19 +160,19 @@ class ColumnsToCAT:
                             (eclass, stem, tense, aspect, polarity, modality, pos) = ("", "", "", "", "", "", "")
 
                     #TIMEX3
-                    if cols[9] != "O":                    
+                    if cols[11] != "O":                    
                         if timex_id == "O":
-                            (timex_id, start_tmx, end_tmx) = (cols[9], tid, tid)
-                            (ttype, tvalue, tanchor, tfunction, tfunc_in_doc) = (cols[10], cols[11], cols[12], cols[13], cols[14])   
-                            self.__generateLinks(rel, cols[15], "TLINK")
-                        elif cols[9] == timex_id:
+                            (timex_id, start_tmx, end_tmx) = (cols[11], tid, tid)
+                            (ttype, tvalue, tanchor, tfunction, tfunc_in_doc) = (cols[12], cols[13], cols[14], cols[15], cols[16])   
+                            self.__generateLinks(rel, cols[17], "TLINK")
+                        elif cols[11] == timex_id:
                             end_tmx = tid
-                        elif cols[9] != timex_id and start_tmx != 0 and end_tmx != 0:
+                        elif cols[11] != timex_id and start_tmx != 0 and end_tmx != 0:
                             timex = ET.SubElement(mark, "TIMEX3")
                             self.__createTimex(timex, start_tmx, end_tmx, timex_id, ttype, tvalue, tanchor, tfunction, tfunc_in_doc)
-                            (timex_id, start_tmx, end_tmx) = (cols[9], tid, tid)
-                            (ttype, tvalue, tanchor, tfunction, tfunc_in_doc) = (cols[10], cols[11], cols[12], cols[13], cols[14])
-                            self.__generateLinks(rel, cols[15], "TLINK")
+                            (timex_id, start_tmx, end_tmx) = (cols[11], tid, tid)
+                            (ttype, tvalue, tanchor, tfunction, tfunc_in_doc) = (cols[12], cols[13], cols[14], cols[15], cols[16])
+                            self.__generateLinks(rel, cols[17], "TLINK")
                             
                     else:
                         if timex_id != "O" and start_tmx != 0 and end_tmx != 0:
@@ -180,15 +182,15 @@ class ColumnsToCAT:
                             (ttype, tvalue, tanchor, tfunction, tfunc_in_doc) = ("", "", "", "", "")
 
                     #SIGNAL
-                    if cols[19]!= "O":                    
+                    if cols[21]!= "O":                    
                         if signal_id == "O":
-                            (signal_id, start_sig, end_sig) = (cols[19], tid, tid)
-                        elif cols[19] == signal_id:
+                            (signal_id, start_sig, end_sig) = (cols[21], tid, tid)
+                        elif cols[21] == signal_id:
                             end_sig = tid
-                        elif cols[19] != signal_id and start_sig != 0 and end_sig != 0:
+                        elif cols[21] != signal_id and start_sig != 0 and end_sig != 0:
                             signal = ET.SubElement(mark, "SIGNAL")
                             self.__createSignal(signal, start_sig, end_sig, signal_id)
-                            (signal_id, start_sig, end_sig) = (cols[19], tid, tid)
+                            (signal_id, start_sig, end_sig) = (cols[21], tid, tid)
                             
                     else:
                         if signal_id != "O" and start_sig != 0 and end_sig != 0:
@@ -197,15 +199,15 @@ class ColumnsToCAT:
                             (signal_id, start_sig, end_sig) = ("O", 0, 0)
 
                     #C-SIGNAL
-                    if cols[20]!= "O":                    
+                    if cols[22]!= "O":                    
                         if csignal_id == "O":
-                            (csignal_id, start_csig, end_csig) = (cols[20], tid, tid)
-                        elif cols[20] == csignal_id:
+                            (csignal_id, start_csig, end_csig) = (cols[22], tid, tid)
+                        elif cols[22] == csignal_id:
                             end_csig = tid
-                        elif cols[20] != csignal_id and start_csig != 0 and end_csig != 0:
+                        elif cols[22] != csignal_id and start_csig != 0 and end_csig != 0:
                             csignal = ET.SubElement(mark, "C-SIGNAL")
                             self.__createSignal(csignal, start_csig, end_csig, csignal_id)
-                            (csignal_id, start_csig, end_csig) = (cols[20], tid, tid)
+                            (csignal_id, start_csig, end_csig) = (cols[22], tid, tid)
                             
                     else:
                         if csignal_id != "O" and start_csig != 0 and end_csig != 0:
@@ -213,11 +215,8 @@ class ColumnsToCAT:
                             self.__createSignal(csignal, start_csig, end_csig, csignal_id)
                             (csignal_id, start_csig, end_csig) = ("O", 0, 0)                  
                 
-                    tid += 1
                     num += 1
-            else: 
-                sid += 1
-
+            
         return doc
 
     '''
