@@ -64,7 +64,7 @@ class CATToColumns:
         for i in range(8): line += "\tO"    #event  
 
         #timex    
-        line += "\t" + self.__getEntityID(dct_id) + "\t" + dct_type + "\t" + dct_value + "\tO\tO\t" + dct_func
+        line += "\t" + self.__getEntityID(dct_id) + "\tB-" + dct_type + "\t" + dct_value + "\tO\tO\t" + dct_func
 
         line += "\t" + self.__getLinkString(self.dict_tlinks, dct_id, 0)  #tlinks
         line += "\tO"   #slinks
